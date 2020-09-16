@@ -30,84 +30,67 @@
 		let srcModal = "";
 		var locker = JSON.parse(window.localStorage.getItem("selectedLocker"));
 
-		function renderLayout(orderNo) {
+		function renderLayout(orderNo, name) {
 				if (!orderNo) {
 					$(".shipping-data").append(
 						`<div id="trButton"></div>`
 					);
-	
-					$(`#trButton`).append(`
-					<div style="display: flex;">
-					<button id="InfoOpen" style="border: #ffff 1px solid;
-					border-radius: .5vh;
-					color: #fff;
-					font-size: 12px;
-					flex: 1;
-					padding: .5vh;
-					background-color: darkblue;">Informações</button>
-					<button
-						id="buttonOpen"
-						style="outline: none;
-						flex: 3;
-						color: white;
-						background-color: darkblue;
-						border-radius: .5vh;
-						border: 1px solid white;
-						text-decoration: none;
-						text-align: center;
-						vertical-align: middle;
-						cursor: pointer;
-						padding: 8px 15px;
-						font-size: 12px;
-						white-space: normal;
-						cursor: pointer;">
-						Receba no e-Box da Clique Retire
-				</button></div>
-			`);
-	
+
+          $(`#trButton`).append(`
+          <div class="box-cliqueretire">
+            <h4>Receba fora de casa</h4>
+            <div class="box-item col-1-2 cliqueretire-image">
+                <a href="#" id="buttonOpen" class=" btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Escolher local para retirada</a>
+            </div>
+            <div class="box-item col-1-2">
+              <div class="content">
+                <div class="inner-content">
+                  <p>Você não precisa ter alguem em casa para receber.</p>
+                  <p>Utilize um e-Box da Clique Retire para retirar sua compra.</p>
+                  <p>
+                    <a href="#" id="InfoOpen" class="click-como-funciona"> Como Funciona </a>
+                  </p>
+                  </div>
+                <div class="box-tag">Recomendado</div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>`);
+
 				} else {
 					$(".shipping-data").append(
-						`<div id="trButton" style="padding: 8px;"></div>`
+						`<div id="trButton"></div>`
 					);
-	
-					$(`#trButton`).append(`<div style="border: 1px solid darkblue;  border-radius: .5vh; padding: 1vh;">
-					<div style="font-size: 24px; margin-left: 1.5vh; color: darkblue; margin-top: 8px;">Entrega Clique Retire</div>
-						
-					<div
-						style="outline: none;
-						color: darkblue;
-						border-radius: .5vh;
-						text-decoration: none;
-						text-align: center;
-						vertical-align: middle;
-						padding: 8px 15px;
-						margin-top: 8px;
-						white-space: normal;
-						font-size: 14px;">
-						Você escolheu o e-box ${orderNo}
-				</div>
-				<div>
-				<div style="display: flex; justify-content: space-between; margin-top: .5vh; margin-bottom: 8px;">
-				<button id="InfoOpen" style="border: #ffff 1px solid;
-				border-radius: .5vh;
-				color: #fff;
-				flex: 1;
-				padding: .5vh;
-				background-color: darkblue;">Informações</button>
-				<button id="buttonOpen" style="border: #ffff 1px solid;
-				border-radius: .5vh;
-				color: #fff;
-				flex: 2;
-				padding: .5vh;
-				background-color: darkblue;">Alterar endereço</button>
-				<button id="cleanerLocker" style="border: white  1px solid;
-				border-radius: .5vh;
-				color: white;
-				flex: 1;
-				padding: .5vh;
-				background-color: darkgrey;">Limpar</button>
-				</div></div>
-				</div> 
+
+          $(`#trButton`).append(`
+          <div class="box-cliqueretire">
+            <h4>Receba fora de casa</h4>
+            <div class="box-item col-1-1">
+						<p>Você escolheu o e-box ${orderNo} - ${name}</p>
+            <button id="cleanerLocker" style="border: white  1px solid;
+            border-radius: .5vh;
+            color: white;
+            flex: 1;
+            padding: .5vh;
+            background-color: darkgrey;">Limpar</button>
+            </div>
+            <div class="box-item col-1-2 cliqueretire-image">
+                <a href="#" id="buttonOpen" class=" btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Alterar local para retirada</a>
+            </div>
+            <div class="box-item col-1-2">
+              <div class="content">
+                <div class="inner-content">
+                  <p>Você não precisa ter alguem em casa para receber.</p>
+                  <p>Utilize um e-Box da Clique Retire para retirar sua compra.</p>
+                  <p>
+                    <a href="#" id="InfoOpen" class="click-como-funciona"> Como Funciona </a>
+                  </p>
+                  </div>
+                <div class="box-tag">Recomendado</div>
+              </div>
+            </div>
+            <div class="clearfix"></div>
+          </div>
 				`);
 				};
 
@@ -137,37 +120,38 @@
 		}
 
 
-		$("html").append(`<div 
-        id="dialog" 
+		$("html").append(`<div
+        id="dialog"
         style="outline: none;
-         background-color: darkblue;
-         border-radius: 0.5vh;">
+         background-color: #0e3cdc;
+         border: 1px solid #ccc;
+         border-radius: 0.5vh;z-index:9999;">
          <div style="display: flex; justify-content: space-between;">
-         <span id="textDialog" style="font-weight: 500;
+         <span id="textDialog" style="font-weight: 400;
          font-size: 16px;
          color: white;
          margin-top: 17px;
          margin-left: 16px;
      ">Clique Retire</span>
-         <button 
-         id="closeIframe" 
+         <button
+         id="closeIframe"
          style="margin-bottom: 16px;
           font-weight: 500;
           margin-right: 16px;
-           background-color: darkblue; border: none; 
+           background-color: #0e3cdc; border: none;
            font-size: 28px;
            margin-top: 16px;
-           color: white; 
-           outline: none;">X</button>
+           color: white;
+           outline: none;">x</button>
          </div>
-                <iframe 
-                id="iframe" 
+                <iframe
+                id="iframe"
                 style="background-color: white;
-                width: 100%; 
-                outline: none; 
-                height: 600px; 
-                width: 100%" 
-                frameborder="0" 
+                width: 100%;
+                outline: none;
+                height: 600px;
+                width: 100%"
+                frameborder="0"
                 marginheight="0" allowfullscreen></iframe>
             </div>`);
 
@@ -176,7 +160,7 @@
 				if (mutations.length && !$("#trButton").length && $(".shipping-data").length)
 					mutations.forEach(function () {
 							if ($(".shipping-container").length && !$("#trButton").length)
-								renderLayout(locker ? locker.orderNo : null);
+								renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null);
 					});
 			});
 
@@ -188,25 +172,27 @@
 
 					if (selectedLocker.orderNo !== locker.orderNo) {
 
-						locker.orderNo = selectedLocker.orderNo;
+            locker.orderNo = selectedLocker.orderNo;
+            locker.name = selectedLocker.name;
 						window.localStorage.setItem("selectedLocker", JSON.stringify({
+              name: selectedLocker.name,
 							orderNo: selectedLocker.orderNo,
 							zip_code: selectedLocker.location.zip_code
 						}));
 
-						window.vtexjs.checkout.sendAttachment('shippingData', {
-							address: {
-								neighborhood: selectedLocker.name,
-								postalCode: selectedLocker.location.zip_code,
-								city: selectedLocker.location.city,
-								state: selectedLocker.location.state,
-								street: selectedLocker.location.street,
-								complement: "CliqueRetire",
-								number: selectedLocker.orderNo || "S/N",
-								country: "BRA",
-								addressType: "residential"
-							}
-						});
+						// window.vtexjs.checkout.sendAttachment('shippingData', {
+						// 	address: {
+						// 		neighborhood: selectedLocker.location.neighborhood,
+						// 		postalCode: selectedLocker.location.zip_code,
+						// 		city: selectedLocker.location.city,
+						// 		state: selectedLocker.location.state,
+						// 		street: selectedLocker.location.street,
+						// 		complement: "CliqueRetire",
+						// 		number: selectedLocker.orderNo || "S/N",
+						// 		country: "BRA",
+						// 		addressType: "residential"
+						// 	}
+						// });
 					}
 				}
 
@@ -222,10 +208,11 @@
 			if(!window.vtexjs.checkout.orderForm.shippingData.address || !locker || window.location.hash === "#/shipping") $("#trButton").remove();
 
 			if ($(".shipping-container").length && window.vtexjs.checkout.orderForm.shippingData.address && !$("#trButton").length){
-				renderLayout(window.vtexjs.checkout.orderForm.shippingData.address.number);
-				
+				renderLayout(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],window.vtexjs.checkout.orderForm.shippingData.address.complement.replace(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],""));
+
 				window.localStorage.setItem("selectedLocker", JSON.stringify({
-					orderNo: window.vtexjs.checkout.orderForm.shippingData.address.number,
+          name: window.vtexjs.checkout.orderForm.shippingData.address.complement.replace(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],""),
+					orderNo: window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],
 					zip_code: window.vtexjs.checkout.orderForm.shippingData.address.postalCode
 				}));
 			} else {
@@ -249,7 +236,7 @@
 			open: function () {
 				$(`#dialog`).css("display", "absolute");
 				$(`.step .text input`).css("z-index", "0")
-				$(`#textDialog`).text(`${srcModal === "/information" ? "Saiba mais Clique Retire" : "Selecione o seu endereço de entrega Clique Retire"}`)
+				$(`#textDialog`).text(`${srcModal === "/information" ? "Saiba mais Clique Retire" : "Selecione o melhor local para retirada do seu pedido"}`)
 				$(".payment-data .step").css("z-index", "0");
 				$(".cart-fixed.affix, .cart-fixed.affix-bottom").css("z-index", "0");
 				$(`#iframe`).attr(
