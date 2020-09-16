@@ -205,8 +205,6 @@
 
 
 		$(window).on('deliverySelected.vtex', function () {
-			if(!window.vtexjs.checkout.orderForm.shippingData.address || !locker || window.location.hash === "#/shipping") $("#trButton").remove();
-
 			if ($(".shipping-container").length && window.vtexjs.checkout.orderForm.shippingData.address && !$("#trButton").length){
 				renderLayout(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],window.vtexjs.checkout.orderForm.shippingData.address.complement.replace(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],""));
 
