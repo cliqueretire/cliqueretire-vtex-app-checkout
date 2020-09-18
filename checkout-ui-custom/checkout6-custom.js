@@ -31,12 +31,12 @@
 		var locker = JSON.parse(window.localStorage.getItem("selectedLocker"));
 
 		function renderLayout(orderNo, name) {
-				if (!orderNo) {
-					$(".shipping-data").append(
-						`<div id="trButton"></div>`
-					);
+			if (!orderNo) {
+				$(".shipping-data").append(
+					`<div id="trButton"></div>`
+				);
 
-          $(`#trButton`).append(`
+				$(`#trButton`).append(`
           <div class="box-cliqueretire">
             <h4>Receba fora de casa</h4>
             <div class="box-item col-1-2 cliqueretire-image">
@@ -57,12 +57,12 @@
             <div class="clearfix"></div>
           </div>`);
 
-				} else {
-					$(".shipping-data").append(
-						`<div id="trButton"></div>`
-					);
+			} else {
+				$(".shipping-data").append(
+					`<div id="trButton"></div>`
+				);
 
-          $(`#trButton`).append(`
+				$(`#trButton`).append(`
           <div class="box-cliqueretire">
             <h4>Receba fora de casa</h4>
             <div class="box-item col-1-1">
@@ -92,11 +92,11 @@
             <div class="clearfix"></div>
           </div>
 				`);
-				};
+			};
 
 			$("#InfoOpen").click(function (e) {
 				e.preventDefault();
-				srcModal = '/information';
+				srcModal = '/cliqueretire/information';
 				!$("#dialog").dialog("isOpen")
 					? $("#dialog").dialog("open")
 					: $("#dialog").dialog("close");
@@ -105,7 +105,7 @@
 
 			$("#buttonOpen").click(function (e) {
 				e.preventDefault();
-				srcModal = "/cr"
+				srcModal = "/cliqueretire/map"
 				!$("#dialog").dialog("isOpen")
 					? $("#dialog").dialog("open")
 					: $("#dialog").dialog("close");
@@ -115,7 +115,8 @@
 				e.preventDefault();
 				vtexjs.checkout.sendAttachment('shippingData', { address: null, availableAddresses: null, logisticsInfo: null });
 				window.localStorage.removeItem("selectedLocker");
-				locker = {};
+				window.location.reload();
+				locker = { userPostalCode: locker.userPostalCode };
 			});
 		}
 
@@ -156,65 +157,77 @@
             </div>`);
 
 		window.onload = () => {
+			const Address = window.vtexjs.checkout.orderForm.shippingData.address;
+
+			window.localStorage.setItem("selectedLocker", JSON.stringify({
+				...locker,
+				userPostalCode: Address.complement && !Address.complement.startsWith("CR0") ? Address.postalCode : null
+			}));
+
 			var observer = new MutationObserver((mutations) => {
 				if (mutations.length && !$("#trButton").length && $(".shipping-data").length)
 					mutations.forEach(function () {
-							if ($(".shipping-container").length && !$("#trButton").length)
-								renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null);
+						if ($(".shipping-container").length && !$("#trButton").length)
+							renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null);
 					});
 			});
 
-
-			window.addEventListener("message", (e) => {
-				$("#dialog").dialog("close");
-				if (e.data.length > 0 && locker) {
-					var selectedLocker = JSON.parse(e.data);
-
-					if (selectedLocker.orderNo !== locker.orderNo) {
-
-            locker.orderNo = selectedLocker.orderNo;
-            locker.name = selectedLocker.name;
-						window.localStorage.setItem("selectedLocker", JSON.stringify({
-              name: selectedLocker.name,
-							orderNo: selectedLocker.orderNo,
-							zip_code: selectedLocker.location.zip_code
-						}));
-
-						// window.vtexjs.checkout.sendAttachment('shippingData', {
-						// 	address: {
-						// 		neighborhood: selectedLocker.location.neighborhood,
-						// 		postalCode: selectedLocker.location.zip_code,
-						// 		city: selectedLocker.location.city,
-						// 		state: selectedLocker.location.state,
-						// 		street: selectedLocker.location.street,
-						// 		complement: "CliqueRetire",
-						// 		number: selectedLocker.orderNo || "S/N",
-						// 		country: "BRA",
-						// 		addressType: "residential"
-						// 	}
-						// });
-					}
-				}
-
-
-			});
-
 			observer.observe(document.body, { childList: true, attributes: true });
-
 		}
 
 
 		$(window).on('deliverySelected.vtex', function () {
-			if ($(".shipping-container").length && window.vtexjs.checkout.orderForm.shippingData.address && !$("#trButton").length){
-				renderLayout(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],window.vtexjs.checkout.orderForm.shippingData.address.complement.replace(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],""));
-
+			const Address = window.vtexjs.checkout.orderForm.shippingData.address;
+			const setItem = ({ name, orderNo, userPostalCode, address }) => {
 				window.localStorage.setItem("selectedLocker", JSON.stringify({
-          name: window.vtexjs.checkout.orderForm.shippingData.address.complement.replace(window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],""),
-					orderNo: window.vtexjs.checkout.orderForm.shippingData.address.complement.split(" ")[0],
-					zip_code: window.vtexjs.checkout.orderForm.shippingData.address.postalCode
+					name,
+					orderNo,
+					userPostalCode,
+					address,
 				}));
+			};
+
+			if (Address.complement && Address.complement.startsWith("CR0")) {
+				setItem({
+					name: Address.complement.replace(Address.complement.split(" ")[0], ""),
+					orderNo: Address.complement.split(" ")[0],
+					userPostalCode: locker ? locker.userPostalCode : null,
+					address: {
+						neighborhood: Address.neighborhood,
+						postalCode: Address.postalCode,
+						city: Address.city,
+						state: Address.state,
+						street: Address.street,
+						complement: Address.complement,
+						number: Address.number || "S/N",
+						country: "BRA",
+						addressType: "residential"
+					},
+				});
 			} else {
-				if ($(".shipping-container").length && !$("#trButton").length)
+				setItem({
+					name: null,
+					orderNo: null,
+					userPostalCode: !Address.complement.startsWith("CR0") ? Address.postalCode : locker.userPostalCode,
+					address: {
+						neighborhood: Address.neighborhood,
+						postalCode: Address.postalCode,
+						city: Address.city,
+						state: Address.state,
+						street:Address.street,
+						complement: Address.complement,
+						number: Address.number || "S/N",
+						country: "BRA",
+						addressType: "residential"
+					},
+				});
+			}
+
+			if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length) {
+				renderLayout(Address.complement.split(" ")[0], Address.complement.replace(Address.complement.split(" ")[0], ""));
+
+			} else {
+				if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length)
 					renderLayout(null);
 			}
 		})
@@ -234,7 +247,7 @@
 			open: function () {
 				$(`#dialog`).css("display", "absolute");
 				$(`.step .text input`).css("z-index", "0")
-				$(`#textDialog`).text(`${srcModal === "/information" ? "Saiba mais Clique Retire" : "Selecione o melhor local para retirada do seu pedido"}`)
+				$(`#textDialog`).text(`${srcModal === "/cliqueretire/information" ? "Saiba mais Clique Retire" : "Selecione o melhor local para retirada do seu pedido"}`)
 				$(".payment-data .step").css("z-index", "0");
 				$(".cart-fixed.affix, .cart-fixed.affix-bottom").css("z-index", "0");
 				$(`#iframe`).attr(
