@@ -157,11 +157,14 @@
             </div>`);
 
 		window.onload = () => {
-			const Address = window.vtexjs.checkout.orderForm.shippingData.address;
+			const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null;
 
 			window.localStorage.setItem("selectedLocker", JSON.stringify({
 				...locker,
-				userPostalCode: Address.complement && !Address.complement.startsWith("CR0") ? Address.postalCode : null
+				userPostalCode: Address && Address.complement && !Address.complement.startsWith("CR0") 
+				? Address.postalCode 
+				: locker && locker.userPostalCode 
+					? locker.userPostalCode : null
 			}));
 
 			var observer = new MutationObserver((mutations) => {
@@ -172,12 +175,15 @@
 					});
 			});
 
+			if ($(".shipping-container").length && !$("#trButton").length)
+				renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null);
+
 			observer.observe(document.body, { childList: true, attributes: true });
 		}
 
 
 		$(window).on('deliverySelected.vtex', function () {
-			const Address = window.vtexjs.checkout.orderForm.shippingData.address;
+			const Address =  window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null;
 			const setItem = ({ name, orderNo, userPostalCode, address }) => {
 				window.localStorage.setItem("selectedLocker", JSON.stringify({
 					name,
@@ -187,7 +193,7 @@
 				}));
 			};
 
-			if (Address.complement && Address.complement.startsWith("CR0")) {
+			if (Address && Address.complement && Address.complement.startsWith("CR0")) {
 				setItem({
 					name: Address.complement.replace(Address.complement.split(" ")[0], ""),
 					orderNo: Address.complement.split(" ")[0],
@@ -205,29 +211,33 @@
 					},
 				});
 			} else {
-				setItem({
-					name: null,
-					orderNo: null,
-					userPostalCode: !Address.complement.startsWith("CR0") ? Address.postalCode : locker.userPostalCode,
-					address: {
-						neighborhood: Address.neighborhood,
-						postalCode: Address.postalCode,
-						city: Address.city,
-						state: Address.state,
-						street:Address.street,
-						complement: Address.complement,
-						number: Address.number || "S/N",
-						country: "BRA",
-						addressType: "residential"
-					},
-				});
+				if(Address)
+					setItem({
+						name: null,
+						orderNo: null,
+						userPostalCode: Address && ((Address.complement && !Address.complement.startsWith("CR0")) 
+						|| !Address.complement) 
+							? Address.postalCode 
+							: locker && locker.userPostalCode,
+						address: {
+							neighborhood: Address.neighborhood,
+							postalCode: Address.postalCode,
+							city: Address.city,
+							state: Address.state,
+							street:Address.street,
+							complement: Address.complement,
+							number: Address.number || "S/N",
+							country: "BRA",
+							addressType: "residential"
+						},
+					});
 			}
 
 			if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length) {
 				renderLayout(Address.complement.split(" ")[0], Address.complement.replace(Address.complement.split(" ")[0], ""));
 
 			} else {
-				if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length)
+				if ($(".shipping-container").length && !$("#trButton").length)
 					renderLayout(null);
 			}
 		})
