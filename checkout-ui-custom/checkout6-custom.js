@@ -75,7 +75,7 @@
             background-color: darkgrey;">Limpar</button>
             </div>
             <div class="box-item col-1-2 cliqueretire-image">
-                <a href="#" id="buttonOpen" class=" btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Alterar local para retirada</a>
+                <a href="#" id="buttonOpen" class="btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Alterar local para retirada</a>
             </div>
             <div class="box-item col-1-2">
               <div class="content">
@@ -113,9 +113,9 @@
 
 			$(`#cleanerLocker`).click(function (e) {
 				e.preventDefault();
-				vtexjs.checkout.sendAttachment('shippingData', { address: null, availableAddresses: null, logisticsInfo: null });
+				vtexjs.checkout.sendAttachment('shippingData', { address: null, availableAddresses: null, logisticsInfo: null }).then(() => window.location.reload()).fail(e => console.log(e))
 				window.localStorage.removeItem("selectedLocker");
-				window.location.reload();
+
 				locker = { userPostalCode: locker.userPostalCode };
 			});
 		}
@@ -232,6 +232,8 @@
 						},
 					});
 			}
+
+			if((window.location.hash == "#/payment" || window.location.hash == "#/shipping") && !locker.name) $("#trButton").remove();
 
 			if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length) {
 				renderLayout(Address.complement.split(" ")[0], Address.complement.replace(Address.complement.split(" ")[0], ""));
