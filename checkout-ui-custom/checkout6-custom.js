@@ -233,7 +233,7 @@
 					});
 			}
 
-			if((window.location.hash == "#/payment" || window.location.hash == "#/shipping") && !locker.name) $("#trButton").remove();
+			if((window.location.hash == "#/payment" || window.location.hash == "#/shipping") && locker && !locker.name) $("#trButton").remove();
 
 			if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length) {
 				renderLayout(Address.complement.split(" ")[0], Address.complement.replace(Address.complement.split(" ")[0], ""));
@@ -248,7 +248,8 @@
 			autoOpen: false,
 			closeOnEscape: false,
 			draggable: false,
-			width: 1000,
+			width: /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) ? 400 : 1000,
+			resizable: true,
 			fluid: true,
 			position: {
 				my: "center",
