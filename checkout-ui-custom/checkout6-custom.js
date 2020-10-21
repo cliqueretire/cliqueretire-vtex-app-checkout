@@ -28,19 +28,74 @@
 
 	var myAppJavaScript = async function ($) {
 		let srcModal = "";
-		var locker = JSON.parse(window.localStorage.getItem("selectedLocker"));
+		
+		const UpdateCliqueRetire = (locker, renderLayout, newName, newOrderNo) => {
+			if ((window.location.hash == "#/payment" || window.location.hash == "#/shipping") && locker && !locker.name) $("#cr_trButton").remove();
+
+			if ($(".shipping-container").length && !$("#cr_trButton").length)
+				renderLayout(newOrderNo, newName);
+		}
+
+		const setItemToStorage = (data) => {
+
+			const { name, orderNo, userPostalCode, address } = data;
+
+			window.localStorage.setItem("cr_selectedLocker", JSON.stringify({
+				name,
+				orderNo,
+				userPostalCode,
+				address,
+			}));
+		};
+
+		const AddressInfo = (Address, locker) => {
+			return !Address ? null : (Address.complement && Address.complement.startsWith("CR0"))
+				? {
+					name: Address.complement.replace(Address.complement.split(" ")[0], ""),
+					orderNo: Address.complement.split(" ")[0],
+					userPostalCode: ((Address.complement && !Address.complement.startsWith("CR0")) || !Address.complement) ? Address.postalCode : locker ? locker.userPostalCode : null,
+					address: {
+						neighborhood: Address.neighborhood,
+						postalCode: Address.postalCode,
+						city: Address.city,
+						state: Address.state,
+						street: Address.street,
+						complement: Address.complement,
+						number: Address.number || "S/N",
+						country: "BRA",
+						addressType: "residential"
+					}
+				} : {
+					name: null,
+					orderNo: null,
+					address: {
+						neighborhood: Address.neighborhood,
+						postalCode: Address.postalCode,
+						city: Address.city,
+						state: Address.state,
+						street: Address.street,
+						complement: Address.complement,
+						number: Address.number || "S/N",
+						country: "BRA",
+						addressType: "residential"
+					}
+				}
+		}
+
+		var locker = JSON.parse(window.localStorage.getItem("cr_selectedLocker"));
 
 		function renderLayout(orderNo, name) {
-			if (!orderNo) {
-				$(".shipping-data").append(
-					`<div id="trButton"></div>`
-				);
+			$(".shipping-data").append(
+				`<div id="cr_trButton"></div>`
+			);
 
-				$(`#trButton`).append(`
-          <div class="box-cliqueretire">
+			if (!orderNo) {
+
+				$(`#cr_trButton`).append(`
+          <div class="cr_box-cliqueretire">
             <h4>Receba fora de casa</h4>
-            <div class="box-item col-1-2 cliqueretire-image">
-                <a href="#" id="buttonOpen" class=" btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Escolher local para retirada</a>
+            <div class="cr_box-item col-1-2 cliqueretire-image">
+                <a href="#" id="cr_buttonOpen" class=" btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Escolher local para retirada</a>
             </div>
             <div class="box-item col-1-2">
               <div class="content">
@@ -48,24 +103,21 @@
                   <p>Você não precisa ter alguem em casa para receber.</p>
                   <p>Utilize um e-Box da Clique Retire para retirar sua compra.</p>
                   <p>
-                    <a href="#" id="InfoOpen" class="click-como-funciona"> Como Funciona </a>
+                    <a href="#" id="cr_InfoOpen" class="click-como-funciona"> Como Funciona </a>
                   </p>
                   </div>
-                <div class="box-tag">Recomendado</div>
+                <div class="cr_box-tag">Recomendado</div>
               </div>
             </div>
             <div class="clearfix"></div>
           </div>`);
 
 			} else {
-				$(".shipping-data").append(
-					`<div id="trButton"></div>`
-				);
 
-				$(`#trButton`).append(`
-          <div class="box-cliqueretire">
+				$(`#cr_trButton`).append(`
+          <div class="cr_box-cliqueretire">
             <h4>Receba fora de casa</h4>
-            <div class="box-item col-1-1">
+            <div class="cr_box-item col-1-1">
 						<p>Você escolheu o e-box ${orderNo} - ${name}</p>
             <button id="cleanerLocker" style="border: white  1px solid;
             border-radius: .5vh;
@@ -74,8 +126,8 @@
             padding: .5vh;
             background-color: darkgrey;">Limpar</button>
             </div>
-            <div class="box-item col-1-2 cliqueretire-image">
-                <a href="#" id="buttonOpen" class="btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Alterar local para retirada</a>
+            <div class="box-item col-1-2 cr_cliqueretire-image">
+                <a href="#" id="cr_buttonOpen" class="btn btn-large btn-success" style="margin-top:20px;margin-bottom:20px;">Alterar local para retirada</a>
             </div>
             <div class="box-item col-1-2">
               <div class="content">
@@ -83,10 +135,10 @@
                   <p>Você não precisa ter alguem em casa para receber.</p>
                   <p>Utilize um e-Box da Clique Retire para retirar sua compra.</p>
                   <p>
-                    <a href="#" id="InfoOpen" class="click-como-funciona"> Como Funciona </a>
+                    <a href="#" id="cr_InfoOpen" class="click-como-funciona"> Como Funciona </a>
                   </p>
                   </div>
-                <div class="box-tag">Recomendado</div>
+                <div class="cr_box-tag">Recomendado</div>
               </div>
             </div>
             <div class="clearfix"></div>
@@ -94,16 +146,16 @@
 				`);
 			};
 
-			$("#InfoOpen").click(function (e) {
+			$("#cr_InfoOpen").click(function (e) {
 				e.preventDefault();
 				srcModal = '/cliqueretire/information';
-				!$("#dialog").dialog("isOpen")
-					? $("#dialog").dialog("open")
-					: $("#dialog").dialog("close");
+				!$("#cr_dialog").dialog("isOpen")
+					? $("#cr_dialog").dialog("open")
+					: $("#cr_dialog").dialog("close");
 			});
 
 
-			$("#buttonOpen").click(function (e) {
+			$("#cr_buttonOpen").click(function (e) {
 				e.preventDefault();
 				srcModal = "/cliqueretire/map"
 				!$("#dialog").dialog("isOpen")
@@ -111,7 +163,7 @@
 					: $("#dialog").dialog("close");
 			});
 
-			$(`#cleanerLocker`).click(function (e) {
+			$(`#cr_cleanerLocker`).click(function (e) {
 				e.preventDefault();
 				vtexjs.checkout.sendAttachment('shippingData', { address: null, availableAddresses: null, logisticsInfo: null }).then(() => window.location.reload()).fail(e => console.log(e))
 				window.localStorage.removeItem("selectedLocker");
@@ -122,7 +174,7 @@
 
 
 		$("html").append(`<div
-        id="dialog"
+        id="cr_dialog"
         style="outline: none;
          background-color: #0e3cdc;
          border: 1px solid #ccc;
@@ -135,7 +187,7 @@
          margin-left: 16px;
      ">Clique Retire</span>
          <button
-         id="closeIframe"
+         id="cr_closeIframe"
          style="margin-bottom: 16px;
           font-weight: 500;
           margin-right: 16px;
@@ -146,7 +198,7 @@
            outline: none;">x</button>
          </div>
                 <iframe
-                id="iframe"
+                id="cr_iframe"
                 style="background-color: white;
                 width: 100%;
                 outline: none;
@@ -159,23 +211,17 @@
 		window.onload = () => {
 			const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null;
 
-			window.localStorage.setItem("selectedLocker", JSON.stringify({
-				...locker,
-				userPostalCode: Address && Address.complement && !Address.complement.startsWith("CR0") 
-				? Address.postalCode 
-				: locker && locker.userPostalCode 
-					? locker.userPostalCode : null
-			}));
+			setItemToStorage(AddressInfo(Address, locker));
 
 			var observer = new MutationObserver((mutations) => {
-				if (mutations.length && !$("#trButton").length && $(".shipping-data").length)
+				if (mutations.length && !$("#cr_trButton").length && $(".shipping-data").length)
 					mutations.forEach(function () {
-						if ($(".shipping-container").length && !$("#trButton").length)
+						if ($(".shipping-container").length && !$("#cr_trButton").length)
 							renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null);
 					});
 			});
 
-			if ($(".shipping-container").length && !$("#trButton").length)
+			if ($(".shipping-container").length && !$("#cr_trButton").length)
 				renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null);
 
 			observer.observe(document.body, { childList: true, attributes: true });
@@ -183,68 +229,14 @@
 
 
 		$(window).on('deliverySelected.vtex', function () {
-			const Address =  window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null;
-			const setItem = ({ name, orderNo, userPostalCode, address }) => {
-				window.localStorage.setItem("selectedLocker", JSON.stringify({
-					name,
-					orderNo,
-					userPostalCode,
-					address,
-				}));
-			};
+			const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null;
+			
+			Address && setItemToStorage(AddressInfo(Address, locker));
 
-			if (Address && Address.complement && Address.complement.startsWith("CR0")) {
-				setItem({
-					name: Address.complement.replace(Address.complement.split(" ")[0], ""),
-					orderNo: Address.complement.split(" ")[0],
-					userPostalCode: locker ? locker.userPostalCode : null,
-					address: {
-						neighborhood: Address.neighborhood,
-						postalCode: Address.postalCode,
-						city: Address.city,
-						state: Address.state,
-						street: Address.street,
-						complement: Address.complement,
-						number: Address.number || "S/N",
-						country: "BRA",
-						addressType: "residential"
-					},
-				});
-			} else {
-				if(Address)
-					setItem({
-						name: null,
-						orderNo: null,
-						userPostalCode: Address && ((Address.complement && !Address.complement.startsWith("CR0")) 
-						|| !Address.complement) 
-							? Address.postalCode 
-							: locker && locker.userPostalCode,
-						address: {
-							neighborhood: Address.neighborhood,
-							postalCode: Address.postalCode,
-							city: Address.city,
-							state: Address.state,
-							street:Address.street,
-							complement: Address.complement,
-							number: Address.number || "S/N",
-							country: "BRA",
-							addressType: "residential"
-						},
-					});
-			}
-
-			if((window.location.hash == "#/payment" || window.location.hash == "#/shipping") && locker && !locker.name) $("#trButton").remove();
-
-			if ($(".shipping-container").length && Address && Address.complement && Address.complement.startsWith("CR0") && !$("#trButton").length) {
-				renderLayout(Address.complement.split(" ")[0], Address.complement.replace(Address.complement.split(" ")[0], ""));
-
-			} else {
-				if ($(".shipping-container").length && !$("#trButton").length)
-					renderLayout(null);
-			}
+			UpdateCliqueRetire(locker, renderLayout, AddressInfo(Address, locker).orderNo, AddressInfo(Address, locker).name)
 		})
 
-		$(`#dialog`).dialog({
+		$(`#cr_dialog`).dialog({
 			autoOpen: false,
 			closeOnEscape: false,
 			draggable: false,
@@ -258,18 +250,18 @@
 			},
 
 			open: function () {
-				$(`#dialog`).css("display", "absolute");
+				$(`#cr_dialog`).css("display", "absolute");
 				$(`.step .text input`).css("z-index", "0")
-				$(`#textDialog`).text(`${srcModal === "/cliqueretire/information" ? "Saiba mais Clique Retire" : "Selecione o melhor local para retirada do seu pedido"}`)
+				$(`#cr_textDialog`).text(`${srcModal === "/cliqueretire/information" ? "Saiba mais Clique Retire" : "Selecione o melhor local para retirada do seu pedido"}`)
 				$(".payment-data .step").css("z-index", "0");
 				$(".cart-fixed.affix, .cart-fixed.affix-bottom").css("z-index", "0");
-				$(`#iframe`).attr(
+				$(`#cr_iframe`).attr(
 					"src",
 					srcModal
 				);
 			},
 			close: function () {
-				$("#dialog").dialog("close");
+				$("#cr_dialog").dialog("close");
 			},
 		});
 
@@ -279,7 +271,7 @@
 
 		$(`.ui-dialog`).css("margin-top", `100px`);
 
-		$("#closeIframe").click(function () {
+		$("#cr_closeIframe").click(function () {
 			$("#dialog").dialog("close");
 		});
 	}
