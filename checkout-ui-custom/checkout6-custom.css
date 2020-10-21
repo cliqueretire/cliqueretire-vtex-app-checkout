@@ -74,3 +74,51 @@
   margin-right: -55px;
   margin-top: 5px;
 }
+
+#cr_cleanerLocker {
+  border: white  1px solid;
+  border-radius: .5vh;
+  color: white;
+  flex: 1;
+  padding: .5vh;
+  background-color: darkgrey;
+}
+
+#cr_buttonOpen {
+  margin-top:20px;
+  margin-bottom:20px;
+}
+
+#cr_dialog {
+  outline: none;
+  background-color: #0e3cdc;
+  border: 1px solid #ccc;
+  border-radius: 0.5vh;z-index:9999;
+}
+
+#cr_textDialog {
+  font-weight: 400;
+  font-size: 16px;
+  color: white;
+  margin-top: 17px;
+  margin-left: 16px;
+}
+
+#cr_closeIframe {
+  margin-bottom: 16px;
+  font-weight: 500;
+  margin-right: 16px;
+  background-color: #0e3cdc; border: none;
+  font-size: 28px;
+  margin-top: 16px;
+  color: white;
+  outline: none;
+}
+
+#cr_iframe {
+  background-color: white;
+  width: 100%;
+  outline: none;
+  height: 600px;
+  width: 100%
+}
