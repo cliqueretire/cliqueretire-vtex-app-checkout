@@ -26,24 +26,39 @@
     document.getElementsByTagName("head")[0].appendChild(script)
   }
 
-  const UpdateCliqueRetire = (locker, renderLayout, newName, newOrderNo) => {
-    if ((window.location.hash == "#/payment" || window.location.hash == "#/shipping") && locker && !locker.name) $("#cr_trButton").remove()
+  const UpdateCliqueRetire = (renderLayout, newOrderNo, newName) => {
+    if (window.location.hash == "#/payment" 
+    || window.location.hash == "#/shipping") $("#cr_trButton").remove()
 
-    if ($(".shipping-container").length && !$("#cr_trButton").length) renderLayout(newOrderNo, newName)
+    if ($(".shipping-container").length 
+      && !$("#cr_trButton").length) 
+        renderLayout(newOrderNo, newName)
   }
 
   const setItemToStorage = (data) => {
-    const { name, orderNo, userPostalCode, address } = data
+    if (data) {
+      const { name, orderNo, userPostalCode, address } = data
 
-    window.localStorage.setItem(
-      "cr_selectedLocker",
-      JSON.stringify({
-        name,
-        orderNo,
-        userPostalCode,
-        address,
-      })
-    )
+      window.localStorage.setItem(
+        "cr_selectedLocker",
+        JSON.stringify({
+          name,
+          orderNo,
+          userPostalCode,
+          address,
+        })
+      )
+    } else {
+      window.localStorage.setItem(
+        "cr_selectedLocker",
+        JSON.stringify({
+          name: null,
+          orderNo: null,
+          userPostalCode: null,
+          address: null,
+        })
+      )
+    }
   }
 
   const AddressInfo = (Address, locker) => {
@@ -83,10 +98,12 @@
       $(`#cr_trButton`).append(`
           <div class="cr_box-cliqueretire">
             <h4>Receba fora de casa</h4>
-            <div class="cr_box-item col-1-2 cliqueretire-image">
+            <div class="cr_box-item col-1-2">
 				${
           !orderNo
-            ? `<a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Escolher local para retirada</a>`
+            ? `	<div class="box-item col-1-2 cr_cliqueretire-image">
+            <a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Escolher local para retirada</a>
+            </div>`
             : `<p>Você escolheu o e-box ${orderNo} - ${name}</p> 
 					<button id="cr_cleanerLocker">Limpar</button>
 					</div>
@@ -96,7 +113,6 @@
 					`
         }
 
-            </div>
             <div class="box-item col-1-2">
               <div class="content">
                 <div class="inner-content">
@@ -108,6 +124,7 @@
                   </div>
                 <div class="cr_box-tag">Recomendado</div>
               </div>
+            </div>
             </div>
             <div class="clearfix"></div>
           </div>`)
@@ -121,7 +138,7 @@
       $("#cr_buttonOpen").click(function (e) {
         e.preventDefault()
         srcModal = "/cliqueretire/map"
-        !$("#dialog").dialog("isOpen") ? $("#dialog").dialog("open") : $("#dialog").dialog("close")
+        !$("#cr_dialog").dialog("isOpen") ? $("#cr_dialog").dialog("open") : $("#cr_dialog").dialog("close")
       })
 
       $(`#cr_cleanerLocker`).click(function (e) {
@@ -130,7 +147,7 @@
           .sendAttachment("shippingData", { address: null, availableAddresses: null, logisticsInfo: null })
           .then(() => window.location.reload())
           .fail((e) => console.log(e))
-        window.localStorage.removeItem("selectedLocker")
+        window.localStorage.removeItem("cr_selectedLocker")
 
         locker = { userPostalCode: locker.userPostalCode }
       })
@@ -141,8 +158,7 @@
          <div style="display: flex; justify-content: space-between;">
          <span id="cr_textDialog">Clique Retire</span>
          <button
-         id="cr_closeIframe"
-         style="">x</button>
+         id="cr_closeIframe">x</button>
          </div>
                 <iframe
                 id="cr_iframe"
@@ -151,19 +167,22 @@
             </div>`)
 
     window.onload = () => {
-      const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null
+      const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : locker
+      
+      const FullInfoPayload = AddressInfo(Address, locker);
 
-      setItemToStorage(AddressInfo(Address, locker))
-
+      if(Address) setItemToStorage(FullInfoPayload)
+      
       var observer = new MutationObserver((mutations) => {
         if (mutations.length && !$("#cr_trButton").length && $(".shipping-data").length)
           mutations.forEach(function () {
             if ($(".shipping-container").length && !$("#cr_trButton").length)
-              renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null)
+              renderLayout(FullInfoPayload ? FullInfoPayload.orderNo : null, FullInfoPayload ? FullInfoPayload.name : null)
           })
       })
 
-      if ($(".shipping-container").length && !$("#cr_trButton").length) renderLayout(locker ? locker.orderNo : null, locker ? locker.name : null)
+      if ($(".shipping-container").length && !$("#cr_trButton").length) 
+        renderLayout(FullInfoPayload ? FullInfoPayload.orderNo : null, FullInfoPayload ? FullInfoPayload.name : null)
 
       observer.observe(document.body, { childList: true, attributes: true })
     }
@@ -171,9 +190,11 @@
     $(window).on("deliverySelected.vtex", function () {
       const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : null
 
-      Address && setItemToStorage(AddressInfo(Address, locker))
+      const FullInfoPayload = AddressInfo(Address, locker)
 
-      UpdateCliqueRetire(locker, renderLayout, AddressInfo(Address, locker).orderNo, AddressInfo(Address, locker).name)
+      if(Address) setItemToStorage(FullInfoPayload)
+
+      UpdateCliqueRetire(renderLayout, FullInfoPayload ? FullInfoPayload.orderNo : null, FullInfoPayload ? FullInfoPayload.name : null)
     })
 
     $(`#cr_dialog`).dialog({
@@ -211,7 +232,7 @@
     $(`.ui-dialog`).css("margin-top", `100px`)
 
     $("#cr_closeIframe").click(function () {
-      $("#dialog").dialog("close")
+      $("#cr_dialog").dialog("close")
     })
   }
 
@@ -224,7 +245,7 @@
     })
   } else {
     loadScript("https://code.jquery.com/ui/1.12.1/jquery-ui.min.js", () => {
-      myAppJavaScript(jQuery)
+      CRCheckout(jQuery)
     })
   }
 })()
