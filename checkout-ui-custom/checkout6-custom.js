@@ -1,4 +1,4 @@
-;(function () {
+(function () {
   /* Load Script function we may need to load jQuery from the Google's CDN */
   /* That code is world-reknown. */
   /* One source: http://snipplr.com/view/18756/loadscript/ */
@@ -25,6 +25,53 @@
     script.src = url
     document.getElementsByTagName("head")[0].appendChild(script)
   }
+
+  const cr_boxCliqueretire = `
+  <div class="cr_box-cliqueretire">
+    <h4>Receba fora de casa</h4>
+    <div class="cr_box-item col-1-2">
+${
+  !orderNo
+    ? `	<div class="box-item col-1-2 cr_cliqueretire-image">
+    <a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Escolher local para retirada</a>
+    </div>`
+    : `<p>Você escolheu o e-box ${orderNo} - ${name}</p> 
+  <button id="cr_cleanerLocker">Limpar</button>
+  </div>
+  <div class="box-item col-1-2 cr_cliqueretire-image">
+    <a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Alterar local para retirada</a>
+  </div>
+  `
+}
+
+    <div class="box-item col-1-2">
+      <div class="content">
+        <div class="inner-content">
+          <p>Você não precisa ter alguem em casa para receber.</p>
+          <p>Utilize um e-Box da Clique Retire para retirar sua compra.</p>
+          <p>
+            <a href="#" id="cr_InfoOpen" class="click-como-funciona"> Como Funciona </a>
+          </p>
+          </div>
+        <div class="cr_box-tag">Recomendado</div>
+      </div>
+    </div>
+    </div>
+    <div class="clearfix"></div>
+  </div>`;
+
+  const cr_dialogTemplate = `<div
+  id="cr_dialog">
+   <div style="display: flex; justify-content: space-between;">
+   <span id="cr_textDialog">Clique Retire</span>
+   <button
+   id="cr_closeIframe">x</button>
+   </div>
+          <iframe
+          id="cr_iframe"
+          frameborder="0"
+          marginheight="0" allowfullscreen></iframe>
+      </div>`;
 
   const UpdateCliqueRetire = (renderLayout, newOrderNo, newName) => {
     if (window.location.hash == "#/payment" 
@@ -95,39 +142,7 @@
     function renderLayout(orderNo, name) {
       $(".shipping-data").append(`<div id="cr_trButton"></div>`)
 
-      $(`#cr_trButton`).append(`
-          <div class="cr_box-cliqueretire">
-            <h4>Receba fora de casa</h4>
-            <div class="cr_box-item col-1-2">
-				${
-          !orderNo
-            ? `	<div class="box-item col-1-2 cr_cliqueretire-image">
-            <a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Escolher local para retirada</a>
-            </div>`
-            : `<p>Você escolheu o e-box ${orderNo} - ${name}</p> 
-					<button id="cr_cleanerLocker">Limpar</button>
-					</div>
-					<div class="box-item col-1-2 cr_cliqueretire-image">
-						<a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Alterar local para retirada</a>
-					</div>
-					`
-        }
-
-            <div class="box-item col-1-2">
-              <div class="content">
-                <div class="inner-content">
-                  <p>Você não precisa ter alguem em casa para receber.</p>
-                  <p>Utilize um e-Box da Clique Retire para retirar sua compra.</p>
-                  <p>
-                    <a href="#" id="cr_InfoOpen" class="click-como-funciona"> Como Funciona </a>
-                  </p>
-                  </div>
-                <div class="cr_box-tag">Recomendado</div>
-              </div>
-            </div>
-            </div>
-            <div class="clearfix"></div>
-          </div>`)
+      $(`#cr_trButton`).append(cr_boxCliqueretire)
 
       $("#cr_InfoOpen").click(function (e) {
         e.preventDefault()
@@ -153,18 +168,7 @@
       })
     }
 
-    $("html").append(`<div
-        id="cr_dialog">
-         <div style="display: flex; justify-content: space-between;">
-         <span id="cr_textDialog">Clique Retire</span>
-         <button
-         id="cr_closeIframe">x</button>
-         </div>
-                <iframe
-                id="cr_iframe"
-                frameborder="0"
-                marginheight="0" allowfullscreen></iframe>
-            </div>`)
+    $("html").append(cr_dialogTemplate);
 
     window.onload = () => {
       const Address = window.vtexjs.checkout.orderForm ? window.vtexjs.checkout.orderForm.shippingData.address : locker
