@@ -26,7 +26,7 @@
     document.getElementsByTagName("head")[0].appendChild(script)
   }
 
-  const cr_boxCliqueretire = `
+  const cr_boxCliqueretire = (orderNo, name) => `
   <div class="cr_box-cliqueretire">
     <h4>Receba fora de casa</h4>
     <div class="cr_box-item col-1-2">
@@ -142,11 +142,11 @@ ${
     function renderLayout(orderNo, name) {
       $(".shipping-data").append(`<div id="cr_trButton"></div>`)
 
-      $(`#cr_trButton`).append(cr_boxCliqueretire)
+      $(`#cr_trButton`).append(cr_boxCliqueretire(orderNo, name))
 
       $("#cr_InfoOpen").click(function (e) {
         e.preventDefault()
-        srcModal = "/cliqueretire/information"
+         srcModal = "/cliqueretire/information"
         !$("#cr_dialog").dialog("isOpen") ? $("#cr_dialog").dialog("open") : $("#cr_dialog").dialog("close")
       })
 
@@ -162,9 +162,9 @@ ${
           .sendAttachment("shippingData", { address: null, availableAddresses: null, logisticsInfo: null })
           .then(() => window.location.reload())
           .fail((e) => console.log(e))
-        window.localStorage.removeItem("cr_selectedLocker")
+          window.localStorage.removeItem("cr_selectedLocker")
 
-        locker = { userPostalCode: locker.userPostalCode }
+          locker = { userPostalCode: locker.userPostalCode }
       })
     }
 
