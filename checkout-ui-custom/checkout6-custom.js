@@ -211,14 +211,11 @@
             ? selected.name
             : null
 
-          const selectSla = logisticInfo()
-          if (selectSla === carrierName && !$('#cr_trButton').length) {
             UpdateCliqueRetire(
               renderLayout,
               FullInfoPayload ? FullInfoPayload.orderNo : null,
               FullInfoPayload ? FullInfoPayload.name : null
             )
-          }
 
           hasSelect
             ? $(carrierSelector).is(':checked') === false
