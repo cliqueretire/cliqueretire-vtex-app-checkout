@@ -206,8 +206,9 @@
       setInterval(() => {
         if (window.location.hash == '#/shipping') {
           const shippingButton = $('#btn-go-to-payment')
-          const hasSelect = JSON.parse(window.localStorage.getItem('cr_selectedLocker'))
-            ? JSON.parse(window.localStorage.getItem('cr_selectedLocker')).name
+          const selected = JSON.parse(window.localStorage.getItem('cr_selectedLocker'));
+          const hasSelect = selected && selected.name
+            ? selected.name
             : null
 
           const selectSla = logisticInfo()
