@@ -1,4 +1,4 @@
-;(function () {
+;(async function () {
   /* Load Script function we may need to load jQuery from the Google's CDN */
   /* That code is world-reknown. */
   /* One source: http://snipplr.com/view/18756/loadscript/ */
@@ -23,7 +23,17 @@
     document.getElementsByTagName('head')[0].appendChild(script)
   }
 
-  const carrierName = 'Retirar no e-Box Clique Retire'
+  const fetchConfig = async () => {
+    return await (
+      await fetch(`https://services.cliqueretire.com.br/vtex/api/v1/config/read`, {
+        headers: new Headers({ companyUrl: window.location.host })
+      })
+    ).json();
+  };
+
+  const config = await fetchConfig();
+
+  const carrierName = config && config.payload ? config.payload.shipperTitle : 'Clique Retire';
   const carrierSelector = "label[id='" + carrierName + "'] > input"
 
   const logisticInfo = () => {
@@ -145,9 +155,11 @@
         }
   }
 
+
   const CRCheckout = async ($) => {
     let srcModal = ''
-    let locker = JSON.parse(window.localStorage.getItem('cr_selectedLocker'))
+    let locker = JSON.parse(window.localStorage.getItem('cr_selectedLocker'));
+
 
     function renderLayout(orderNo, name) {
       $("label[id='" + carrierName + "']").after(`<div id="cr_trButton"></div>`)
@@ -279,13 +291,14 @@
   if (typeof jQuery === 'undefined' || parseFloat(jQuery.fn.jquery) < 1.7) {
     loadScript('https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', () => {
       loadScript('//ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js', function () {
-        jQuery191 = jQuery.noConflict(true)
-        CRCheckout(jQuery191)
+        jQuery191 = jQuery.noConflict(true);
+
+        if(config && config.payload && config.payload.enable) CRCheckout(jQuery191);
       })
-    })
+    });
   } else {
     loadScript('https://code.jquery.com/ui/1.12.1/jquery-ui.min.js', () => {
-      CRCheckout(jQuery)
+      if(config && config.payload && config.payload.enable) CRCheckout(jQuery)
     })
   }
 })()
