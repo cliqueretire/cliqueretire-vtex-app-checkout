@@ -25,9 +25,7 @@
 
   const fetchConfig = async () => {
     return await (
-      await fetch(`https://services.cliqueretire.com.br/vtex/api/v1/config/read`, {
-        headers: new Headers({ companyUrl: window.location.host })
-      })
+      await fetch(`https://ts5u0iv87k.execute-api.sa-east-1.amazonaws.com/staging/api/v1/config/read/${window.location.host}`)
     ).json();
   };
 
