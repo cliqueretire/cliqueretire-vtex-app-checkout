@@ -1,7 +1,7 @@
 {
   "name": "ebox-checkout",
   "vendor": "cliqueretire",
-  "version": "1.1.4",
+  "version": "1.1.5",
   "title": "Clique Retire Checkout",
   "description": "Checkout ui by Clique Retire",
   "builders": {

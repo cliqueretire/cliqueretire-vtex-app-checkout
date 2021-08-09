@@ -25,12 +25,13 @@
 
   const fetchConfig = async () => {
     return await (
-      await fetch(`https://ts5u0iv87k.execute-api.sa-east-1.amazonaws.com/staging/api/v1/config/read/${window.location.host}`)
+      await fetch(`https://services.cliqueretire.com.br/vtex/api/v1/config/read/${window.location.host}`)
     ).json();
   };
 
   const config = await fetchConfig();
 
+  const stage = "{{settings.STAGE}}";
   const carrierName = config && config.payload ? config.payload.shipperTitle : 'Clique Retire';
   const carrierSelector = "label[id='" + carrierName + "'] > input"
 
@@ -50,7 +51,7 @@
           ? ` <div class="box-item col-1-2 cr_cliqueretire-image">
           <a href="#" id="cr_buttonOpen" class="btn btn-large btn-success">Escolher local para retirada</a>
           </div>`
-          : `<p>Você escolheu o e-box ${orderNo}​ - ${name}​</p> 
+          : `<p>Você escolheu o e-box ${orderNo}​ - ${name}​</p>
         <button id="cr_cleanerLocker">Limpar</button>
         </div>
         <div class="box-item col-1-2 cr_cliqueretire-image">
